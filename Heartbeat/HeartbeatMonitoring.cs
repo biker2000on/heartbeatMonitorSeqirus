@@ -36,6 +36,7 @@ label_3:
 label_4:
         num3 = 4;
         string fileName = "D:\\Reports\\HeartbeatMonitoring\\rtreportsdisable.bat";
+        string gmpFileName = "D:\\Reports\\HeartbeatMonitoring\\GMPalarmreportsdisable.bat";
 label_5:
         ProjectData.ClearProjectError();
         num1 = -2;
@@ -97,6 +98,8 @@ label_21:
           goto label_16;
 label_22:
         num3 = 24;
+        if (Operators.ConditionalCompareObjectEqual(code, (object) "2", false))
+          goto label_56;
 label_23:
         num3 = 25;
         Process.Start(fileName);
@@ -317,6 +320,11 @@ label_55:
             }
             break;
         }
+label_56: // processing for a 2 returned in the digital state which will be defined as BAS slow. 
+          // Need to add email notification here that sends a GMP alarms report was diabled. 
+        num3 = 25;
+        Process.Start(gmpFileName);
+        goto label_42;
       }
       catch (Exception ex) when (ex is Exception & (uint) num1 > 0U & num2 == 0)
       {
