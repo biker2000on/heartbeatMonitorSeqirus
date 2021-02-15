@@ -18,7 +18,7 @@ namespace Heartbeat
     {
     }
 
-    public static string GetFileContents(string FullPath, ref string ErrInfo = "")
+    public static string GetFileContents(string FullPath, ref string ErrInfo)
     {
       string str;
       try
@@ -27,6 +27,7 @@ namespace Heartbeat
         string end = streamReader.ReadToEnd();
         streamReader.Close();
         str = end;
+        return str;
       }
       catch (Exception ex)
       {
@@ -35,7 +36,7 @@ namespace Heartbeat
         ErrInfo = exception.Message;
         ProjectData.ClearProjectError();
       }
-      return str;
+      return "";
     }
 
     public static bool SaveTextToFile(string strData, string FullPath, string ErrInfo = "")
