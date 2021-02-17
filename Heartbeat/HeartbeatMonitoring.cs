@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Mail;
 using System.Threading;
+using System.Timers;
 
 namespace Heartbeat
 {

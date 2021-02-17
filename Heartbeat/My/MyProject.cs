@@ -89,25 +89,30 @@ namespace Heartbeat.My
       }
     }
 
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [ComVisible(false)]
-    internal sealed class ThreadSafeObjectProvider<T> where T : new()
-    {
-      internal T GetInstance
-      {
-        [DebuggerHidden] get
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [ComVisible(false)]
+        internal sealed class ThreadSafeObjectProvider<T> where T : new()
         {
-          if ((object) MyProject.ThreadSafeObjectProvider<T>.m_ThreadStaticValue == null)
-            MyProject.ThreadSafeObjectProvider<T>.m_ThreadStaticValue = new T();
-          return MyProject.ThreadSafeObjectProvider<T>.m_ThreadStaticValue;
-        }
-      }
+            internal T GetInstance
+            {
+                [DebuggerHidden]
+                get
+                {
+                    if ((object)MyProject.ThreadSafeObjectProvider<T>.m_ThreadStaticValue == null)
+                        MyProject.ThreadSafeObjectProvider<T>.m_ThreadStaticValue = new T();
+                    return MyProject.ThreadSafeObjectProvider<T>.m_ThreadStaticValue;
+                }
+            }
 
-      [EditorBrowsable(EditorBrowsableState.Never)]
-      [DebuggerHidden]
-      public ThreadSafeObjectProvider()
-      {
-      }
+            // per https://www.telerik.com/forums/justdecompiler-q2-2013
+            [ThreadStatic, CompilerGenerated]
+            private static T m_ThreadStaticValue;
+
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            [DebuggerHidden]
+            public ThreadSafeObjectProvider()
+            {
+            }
+        }
     }
-  }
 }
