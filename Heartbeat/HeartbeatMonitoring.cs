@@ -11,7 +11,6 @@ using System;
 using System.Diagnostics;
 using System.Net.Mail;
 using System.Threading;
-using System.Timers;
 
 namespace Heartbeat
 {
@@ -26,7 +25,7 @@ namespace Heartbeat
             string str1 = "D:\\Reports\\HeartbeatMonitoring\\Heartbeat\\tag.txt";
             string reportsDisable = "D:\\Reports\\HeartbeatMonitoring\\rtreportsdisable.bat";
             string gmpReportsDisable = "D:\\Reports\\HeartbeatMonitoring\\GMPalarmreportsdisable.bat";
-            
+
             try
             {
                 Connections connections1 = (Connections)new ConnectionsClass();
@@ -42,21 +41,31 @@ namespace Heartbeat
                 DigitalState digitalState = (DigitalState)point.Data.Snapshot.Value;
                 object code = (object)digitalState.Code;
 
-                bool codeOkay;
+                int codeOkay;
                 while (connected)
                 {
                     Thread.Sleep(10000);
                     code = getCurrentValue(code, pisdk);
                     codeOkay = isCodeGood(code, ref ErrInfo1);
-                    if (!codeOkay)
+                    if (codeOkay == 3)
                     {
                         sendEmail(code, reportsDisable, gmpReportsDisable, ref ErrInfo1);
+                        while (codeOkay == 3)
+                        {
+                            Thread.Sleep(10000);
+                            code = getCurrentValue(code, pisdk);
+                            codeOkay = isCodeGood(code, ref ErrInfo1);
+                        }
                     }
-                    while (!codeOkay)
+                    else if (codeOkay > 0)
                     {
-                        Thread.Sleep(10000);
-                        code = getCurrentValue(code, pisdk);
-                        codeOkay = isCodeGood(code, ref ErrInfo1);
+                        sendEmail(code, reportsDisable, gmpReportsDisable, ref ErrInfo1);
+                        while (codeOkay > 0)
+                        {
+                            Thread.Sleep(10000);
+                            code = getCurrentValue(code, pisdk);
+                            codeOkay = isCodeGood(code, ref ErrInfo1);
+                        }
                     }
                     connected = server.Connected;
                     if (!connected)
@@ -164,21 +173,21 @@ namespace Heartbeat
             DigitalState digitalState = (DigitalState)point.Data.Snapshot.Value;
             return (object)digitalState.Code;
         }
-        private static bool isCodeGood(object code, ref string ErrInfo)
+        private static int isCodeGood(object code, ref string ErrInfo)
         {
             if (Operators.ConditionalCompareObjectEqual(code, (object)"1", false))
             {
-                return false;
+                return 1;
             }
             if (Operators.ConditionalCompareObjectEqual(code, (object)"2", false))
             {
-                return false;
+                return 2;
             }
             if (Operators.ConditionalCompareObjectEqual(code, (object)"3", false)) // BAS Slow Collect
             {
-                return false;
+                return 3;
             }
-            return true;
+            return 0;
         }
     }
 }
